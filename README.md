@@ -1,7 +1,5 @@
 # Leaflet Dashboard Template by Rekayasa Data Spasial
 
-![](./logo_rds.png )
-
 <img src="./logo_rds.png" width="200" height="200" />
 
 
