@@ -32,6 +32,7 @@
         margin: 5vh;
         box-shadow: 0 0 15px 0 black;
         border-radius: 15px;
+        padding: 15px;
     }
 </style>
     <link rel="stylesheet" href="../node_modules/leaflet/dist/leaflet.css">
@@ -41,14 +42,45 @@
     <script src="../node_modules/leaflet/dist/leaflet.js"></script>
     <script src="../node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
     <script src="../node_modules/jquery/dist/jquery.js"></script>
+
+    <!-- extension -->
+    <script src="https://unpkg.com/h3-js"></script>
 <body>
     <div id="map"></div>
-    <div id="control"></div>
+    <div id="control">
+        <label for="scale">h3 scale:</label>
+
+        <select id="scale">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4" selected>4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+        </select>
+
+    </div>
+    
+    
+    
+    
+    
+    <!-- script is how we develop the app -->
     <script>
+        // base map and draw control
         const map = L.map('map').setView([51.505, -0.09], 13);
         const ol = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19,attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'})
         ol.addTo(map)
         const drawnItems = new L.FeatureGroup();
+        const h3polygons= new L.FeatureGroup();;
+        h3polygons.addTo(map)
         map.addLayer(drawnItems);
         const drawControl = new L.Control.Draw({
             edit: {
@@ -56,6 +88,63 @@
             }
         });
         map.addControl(drawControl);
+
+        let liveGeojson;
+        map.on(L.Draw.Event.CREATED, function (e) {
+            var type = e.layerType,
+                layer = e.layer;
+            if (type === 'marker') {
+                // Do marker specific actions
+            }
+            // Do whatever else you need to. (save to db; add to map etc)
+            drawnItems.eachLayer((l)=>{l.removeFrom(drawnItems)})
+            drawnItems.addLayer(layer.setStyle({fillColor: '#c46758'}));
+            liveGeojson = drawnItems.toGeoJSON()
+            invokeH3()
+        });
+
+
+        function invokeH3(){
+            if (!liveGeojson){
+                console.log("no live geojson")
+                return 0
+            }
+            // console.log(liveGeojson)
+            h3polygons.eachLayer((l)=>{l.removeFrom(h3polygons)})
+            const scale = Number($("#scale").val())
+            const cells = h3.polygonToCells(liveGeojson.features[0].geometry.coordinates, scale)
+            // console.log(cells)
+            // if (cells.length > 0){
+            //     const thehexagons = h3.cellsToMultiPolygon(cells, true);
+            //     const layer = L.polygon(thehexagons).addTo(h3polygons);
+            //     console.log(layer.toGeoJSON())
+            // }
+
+            if (cells.length > 0){
+                const compact = h3.compactCells(cells)
+                console.log(cells)
+                const thehexagons = h3.cellsToMultiPolygon(compact, true);
+                thehexagons.map((i)=>{
+                    const layer = L.polygon(i).addTo(h3polygons);
+                })
+                // const layer = L.polygon(thehexagons).addTo(h3polygons);
+                // console.log(layer.toGeoJSON())
+            }
+
+
+            
+        }
+
+
+        $(document).ready(function(){
+            console.log($("#scale").val())
+            console.log(h3)
+        });
+
+        $( "#scale" ).change(function() {
+            invokeH3()
+        })
+
     </script>
 </body>
 </html>

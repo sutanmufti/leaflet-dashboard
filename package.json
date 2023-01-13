@@ -11,6 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "bootstrap": "^5.2.3",
+    "geojson2h3": "^1.2.0",
+    "h3": "^1.0.2",
+    "h3-js": "^4.0.1",
     "jquery": "^3.6.3",
     "leaflet": "^1.9.3",
     "leaflet-draw": "^1.0.4"
