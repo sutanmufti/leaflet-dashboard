@@ -34,6 +34,11 @@
         border-radius: 15px;
         padding: 15px;
     }
+
+    #indexes {
+        overflow: scroll;
+        height: 40vh;
+    }
 </style>
     <link rel="stylesheet" href="../node_modules/leaflet/dist/leaflet.css">
     <link rel="stylesheet" href="../node_modules/leaflet-draw/dist/leaflet.draw.css">
@@ -65,6 +70,12 @@
             <option value="12">12</option>
             <option value="13">13</option>
         </select>
+
+        <div id="indexes">
+        </div>
+        <button type="button" onclick="CopyToClipboard('indexes')">Copy text</button>
+<br />
+<!-- <textarea placeholder="Press ctrl+v to Paste the copied text" rows="5" cols="20"></textarea> -->
 
     </div>
     
@@ -104,6 +115,7 @@
         });
 
 
+
         function invokeH3(){
             if (!liveGeojson){
                 console.log("no live geojson")
@@ -122,11 +134,42 @@
 
             if (cells.length > 0){
                 const compact = h3.compactCells(cells)
-                console.log(cells)
-                const thehexagons = h3.cellsToMultiPolygon(compact, true);
-                thehexagons.map((i)=>{
-                    const layer = L.polygon(i).addTo(h3polygons);
+                // console.log(cells)
+                // $('#indexes').text(compact)
+                $('#indexes').text("")
+                compact.map((x)=>{
+                    $('#indexes').append( `<p>${x}, </p>` );
                 })
+                const thehexagons = h3.cellsToMultiPolygon (compact, true);
+                
+                    // let samplecell =h3.cellsToMultiPolygon ([compact[0]], true)
+                    // let sample = L.polygon(samplecell[0], {color: 'red'});
+                    // sample.addTo(h3polygons)
+
+                    // samplecell =h3.cellsToMultiPolygon ([compact[1]], true)
+                    // sample = L.polygon(samplecell[0], {color: 'red'});
+                    // sample.addTo(h3polygons)
+
+                    // samplecell =h3.cellsToMultiPolygon ([compact[2]], true)
+                    // sample = L.polygon(samplecell[0], {color: 'red'});
+                    // sample.addTo(h3polygons)
+                    
+
+                compact.map((x)=>{
+                    samplecell =h3.cellsToMultiPolygon ([x], true)
+                    sample = L.polygon(samplecell[0], {color: 'red'});
+                    sample.addTo(h3polygons)
+
+                })
+                
+                console.log("sample cell", samplecell[0])
+                
+                
+                // map.addLayer(sample)
+                // console.log("sample:",sample)
+                // thehexagons.map((i)=>{
+                //     const layer = L.polygon(i).addTo(h3polygons);
+                // })
                 // const layer = L.polygon(thehexagons).addTo(h3polygons);
                 // console.log(layer.toGeoJSON())
             }
@@ -144,7 +187,24 @@
         $( "#scale" ).change(function() {
             invokeH3()
         })
+        console.log(h3)
 
+
+
+        function CopyToClipboard(id){
+    var r = document.createRange();
+    r.selectNode(document.getElementById(id));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(r);
+    try {
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+        alert("copied successfully!")
+        // console.log('Successfully copy text: hello world ' + r);
+    } catch (err) {
+        console.log('Unable to copy!');
+    }
+}
     </script>
 </body>
 </html>
