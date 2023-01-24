@@ -5,6 +5,12 @@
 
 initial template for leaflet desktop app. This should be the infrastructure to create web-gis application by [Rekayasa Data Spasial](https://tentang.rekayasadata.co.uk) and [RekayasaData.co.uk](https://rekayasadata.co.uk/). This is a public repo so feel free to fork or extend this template. thanks.
 
+## H3 Coverage Indexer
+
+Draw polygons and generate h3 compact indices.
+
+<img src="./h3coverage.gif" width="500"  />
+
 ## Installation
 
 Require npm and node just to install the static modules.
